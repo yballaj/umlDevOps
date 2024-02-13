@@ -1,5 +1,4 @@
-podTemplate(
-    cloud: 'kubernetes', 
+podTemplate( 
     containers: [
         containerTemplate(
             name: 'maven', 
