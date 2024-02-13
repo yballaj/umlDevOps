@@ -1,29 +1,25 @@
 podTemplate(
+    cloud: 'kubernetes', 
     containers: [
         containerTemplate(
-            name: 'maven',
-            image: 'adoptopenjdk/maven-openjdk8',
-            command: 'sleep',
-            args: '30d',
-            volumeMounts: [
-                volumeMount(
-                    mountPath: '/root/.m2/repository',
-                    name: 'maven-repo'
-                )
-            ]
+            name: 'maven', 
+            image: 'adoptopenjdk/maven-openjdk8', 
+            command: 'sleep', 
+            args: '30d', 
+            ttyEnabled: true
         )
     ],
     volumes: [
         persistentVolumeClaim(
-            claimName: 'jenkins-pv-claim',
-            mountPath: '/root/.m2/repository',
-            name: 'maven-repo'
+            mountPath: '/root/.m2/repository', 
+            claimName: 'jenkins-pv-claim', 
+            readOnly: false
         )
     ]
 ) {
     node(POD_LABEL) {
         stage('Get a Maven project') {
-            git 'https://github.com/dlambrig/simple-java-maven-app.git'
+            git 'https://github.com/yballaj/umlDevOps.git'
             container('maven') {
                 stage('Build a Maven project') {
                     sh '''
