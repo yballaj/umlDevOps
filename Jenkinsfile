@@ -3,8 +3,6 @@ podTemplate(
         containerTemplate(
             name: 'maven', 
             image: 'maven:3.8.1-jdk-8', 
-            command: 'sleep', 
-            args: '30d', 
             ttyEnabled: true
         )
     ],
