@@ -31,13 +31,13 @@ podTemplate(containers: [
                     }
 
                     publishHTML(target: [
-                        reportDir: 'Chapter08/sample1/build/reports/tests/test',
+                        reportDir: 'Chapter08/sample1',
                         reportFiles: 'index.html',
                         reportName: "JaCoCo Report"
                     ])
 
                     publishHTML(target: [
-                        reportDir: 'Chapter08/sample1/build/reports/checkstyle',
+                        reportDir: 'Chapter08/sample1',
                         reportFiles: 'main.html', 
                         reportName: "JaCoCo Checkstyle Report"
                     ])
