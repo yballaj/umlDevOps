@@ -1,28 +1,46 @@
-podTemplate( 
-    containers: [
-        containerTemplate(
-            name: 'maven', 
-            image: 'maven:3.8.1-jdk-8', 
-            ttyEnabled: true
-        )
-    ],
-    volumes: [
-        persistentVolumeClaim(
-            mountPath: '/root/.m2/repository', 
-            claimName: 'jenkins-pv-claim', 
-            readOnly: false
-        )
-    ]
+podTemplate(containers: [
+    containerTemplate(
+        name: 'gradle', image: 'gradle', command: 'sleep', args: '30d'
+    )],
+    // Set pod retention policy to retain the pod only on failure
+    podRetention: onFailure()
 ) {
+
     node(POD_LABEL) {
-        stage('Get a Maven project') {
-            git 'https://github.com/yballaj/umlDevOps.git'
-            container('maven') {
-                stage('Build a Maven project') {
+        stage('Run pipeline against a gradle project') {
+            container('gradle') {
+                stage('Build a gradle project') {
+                    git 'https://github.com/yballaj/Continuous-Delivery-with-Docker-and-Jenkins-Second-Edition.git'
                     sh '''
-                    echo "maven build"
-                    mvn -B -DskipTests clean install
+                    cd Chapter08/sample1
+                    chmod +x gradlew
                     '''
+                }
+            
+                stage("Tests") {
+                    try {
+                        sh '''
+                        pwd
+                        cd Chapter08/sample1
+                        ./gradlew test
+                        ./gradlew jacocoTestReport
+                        ./gradlew checkstyleMain checkstyleTest
+                        '''
+                    } catch (Exception E) {
+                        echo 'Failure detected'
+                    }
+
+                    publishHTML(target: [
+                        reportDir: 'Chapter08/sample1/build/reports/tests/test',
+                        reportFiles: 'index.html',
+                        reportName: "JaCoCo Report"
+                    ])
+
+                    publishHTML(target: [
+                        reportDir: 'Chapter08/sample1/build/reports/checkstyle',
+                        reportFiles: 'main.html', 
+                        reportName: "JaCoCo Checkstyle Report"
+                    ])
                 }
             }
         }
